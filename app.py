@@ -1,6 +1,6 @@
 """
-Tennis Win Probability Engine - Streamlit App
-Entrypoint: streamlit_app.py (deployed via Streamlit Cloud)
+Minimal, production-ready Streamlit app.
+Entrypoint: app.py (repo root)
 """
 
 import streamlit as st
@@ -23,3 +23,5 @@ if page == "Home":
     home.render()
 elif page == "Tennis Probability Engine":
     tennis.render()
+
+
