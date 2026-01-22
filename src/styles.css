@@ -16,21 +16,24 @@ p, span, div {
 }
 
 h1 {
-  font-size: 2.8rem;
+  font-size: 3.5rem;
   margin-bottom: 0.1rem;
   margin-top: 0.1rem;
+  font-weight: 900;
 }
 
 h2 {
-  font-size: 2.2rem;
+  font-size: 2.8rem;
   margin-bottom: 0.1rem;
   margin-top: 0.1rem;
+  font-weight: 800;
 }
 
 h3 {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   margin-bottom: 0.1rem;
   margin-top: 0.1rem;
+  font-weight: 700;
 }
 
 /* Drastically reduce spacing between elements */

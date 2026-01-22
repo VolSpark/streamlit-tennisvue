@@ -6,7 +6,7 @@ from src.utils import validate_input, format_number
 
 def render():
     """Render the home page."""
-    st.title("🚀 Welcome to My Streamlit App")
+    st.title("🚀 WELCOME TO MY STREAMLIT APP")
 
     st.markdown(
         """
@@ -23,7 +23,7 @@ def render():
     st.divider()
 
     # Example form with inputs
-    st.subheader("Interactive Example")
+    st.subheader("INTERACTIVE EXAMPLE")
 
     col1, col2 = st.columns(2)
 
@@ -43,7 +43,7 @@ def render():
     st.divider()
 
     # Example: Using secrets
-    st.subheader("Secrets Example")
+    st.subheader("SECRETS EXAMPLE")
     st.markdown(
         """
         To use secrets in production:

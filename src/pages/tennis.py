@@ -20,7 +20,7 @@ from src.models.probabilities import (
 
 def render():
     """Render the Tennis Win Probability Engine."""
-    st.title("🎾 Live Tennis Win Probability Engine")
+    st.title("🎾 LIVE TENNIS WIN PROBABILITY ENGINE")
 
     st.markdown(
         """
@@ -38,7 +38,7 @@ def render():
     st.divider()
 
     # DATA INGESTION PANEL
-    st.header("📊 Data Ingestion")
+    st.header("📊 DATA INGESTION")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -69,7 +69,7 @@ def render():
     snapshot = None
 
     if data_mode == "From URL":
-        st.subheader("Fetch from Match URL")
+        st.subheader("FETCH FROM MATCH URL")
         match_url = st.text_input(
             "Match stats URL:",
             placeholder="https://ausopen.com/match/2026-...",
@@ -100,7 +100,7 @@ def render():
                 st.warning("⚠️ Could not extract stats from URL. Please paste or enter manually.")
 
     elif data_mode == "Paste Snapshot":
-        st.subheader("Paste Match Stats")
+        st.subheader("PASTE MATCH STATS")
         pasted_text = st.text_area(
             "Paste JSON, CSV, or key:value stats:",
             height=150,
@@ -116,7 +116,7 @@ def render():
     st.divider()
 
     # MANUAL MATCH CONTEXT
-    st.header("⚙️ Match Context")
+    st.header("⚙️ MATCH CONTEXT")
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -162,7 +162,7 @@ def render():
     st.divider()
 
     # PLAYER SERVE STATS
-    st.header("🎾 Serve Performance Stats")
+    st.header("🎾 SERVE PERFORMANCE STATS")
 
     st.markdown(
         """
@@ -232,7 +232,7 @@ def render():
     st.divider()
 
     # PRIORS & BLENDING
-    st.header("🔧 Priors & Blending")
+    st.header("🔧 PRIORS & BLENDING")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -258,7 +258,7 @@ def render():
     st.divider()
 
     # BUILD SNAPSHOT & COMPUTE
-    st.header("⚡ Compute Probabilities")
+    st.header("⚡ COMPUTE PROBABILITIES")
 
     if st.button("🚀 Calculate Win Probabilities", type="primary"):
         # Create snapshot
@@ -301,7 +301,7 @@ def render():
         # DISPLAY RESULTS
         st.success("✅ Snapshot recorded!")
 
-        st.subheader("📈 Win Probabilities")
+        st.subheader("📈 WIN PROBABILITIES")
 
         # Create a container for prediction history toggle
         show_history = st.checkbox("📋 Show prediction history", value=False)
@@ -326,7 +326,7 @@ def render():
         st.markdown("---")
 
         # DETAILED GAME OUTCOMES - NEW SECTION
-        st.subheader("🎯 Detailed Current Game Analysis")
+        st.subheader("🎯 DETAILED CURRENT GAME ANALYSIS")
 
         game_outcomes, p_deuce, note_outcomes = get_all_game_outcomes(snapshot)
         if game_outcomes is not None:
@@ -365,7 +365,7 @@ def render():
         st.markdown("---")
 
         # Next game prediction
-        st.subheader("🎾 Next Game Prediction")
+        st.subheader("🎾 NEXT GAME PREDICTION")
         next_game_outcomes, next_game_note = forecast_next_game_outcomes(snapshot)
         if next_game_outcomes is not None:
             for outcome, prob in next_game_outcomes.items():
@@ -446,7 +446,7 @@ def render():
         # PREDICTION HISTORY
         if show_history and st.session_state.prediction_history:
             st.divider()
-            st.subheader("📊 Prediction History")
+            st.subheader("📊 PREDICTION HISTORY")
             st.markdown("Previous predictions for reference:")
             
             for idx, pred in enumerate(reversed(st.session_state.prediction_history)):
@@ -494,7 +494,7 @@ def render():
         st.divider()
 
         # EXPORT & SHARE
-        st.subheader("📥 Export & Share")
+        st.subheader("📥 EXPORT & SHARE")
 
         col1, col2 = st.columns(2)
         with col1:
