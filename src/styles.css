@@ -16,39 +16,46 @@ p, span, div {
 }
 
 h1 {
-  font-size: 2.0rem;
-  margin-bottom: 0.5rem;
-  margin-top: 0.5rem;
+  font-size: 2.8rem;
+  margin-bottom: 0.1rem;
+  margin-top: 0.1rem;
 }
 
 h2 {
-  font-size: 1.5rem;
-  margin-bottom: 0.4rem;
-  margin-top: 0.4rem;
+  font-size: 2.2rem;
+  margin-bottom: 0.1rem;
+  margin-top: 0.1rem;
 }
 
 h3 {
-  font-size: 1.2rem;
-  margin-bottom: 0.3rem;
-  margin-top: 0.3rem;
+  font-size: 1.8rem;
+  margin-bottom: 0.1rem;
+  margin-top: 0.1rem;
 }
 
-/* Reduce spacing between elements */
+/* Drastically reduce spacing between elements */
 [data-testid="stVerticalBlock"] > [style*="flex-direction: column"] > [data-testid="stVerticalBlock"] {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.1rem;
+  gap: 0.1rem;
 }
 
 /* Reduce metric spacing */
 [data-testid="metric-container"] {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.1rem;
 }
 
 /* Reduce column spacing */
 [data-testid="column"] {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.1rem;
+  gap: 0.1rem;
 }
 
 /* Compact markdown spacing */
 [data-testid="stMarkdownContainer"] {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.1rem;
+}
+
+/* Reduce gap between rows */
+[data-testid="stHorizontalBlock"] {
+  gap: 0.1rem;
 }
