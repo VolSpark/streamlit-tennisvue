@@ -1,4 +1,4 @@
-git add -A && git commit -m "feat: add dark mode by default with theme toggle" && git push"""
+"""
 Tennis Win Probability Engine - Streamlit App
 Entrypoint: streamlit_app.py (deployed via Streamlit Cloud)
 """
