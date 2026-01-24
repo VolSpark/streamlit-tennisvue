@@ -5,7 +5,7 @@ from datetime import datetime
 import pandas as pd
 import time
 from src.tennis_schema import MatchSnapshot, PlayerStats
-from src.data_sources.url_scraper import fetch_match_stats_from_url
+from src.data_sources.url_scraper import fetch_match_stats_from_url, get_available_match_pages
 from src.data_sources.paste_parser import parse_pasted_stats
 from src.models.probabilities import (
     next_point_probability,
@@ -70,34 +70,79 @@ def render():
 
     if data_mode == "From URL":
         st.subheader("FETCH FROM MATCH URL")
+        st.markdown("""
+        **Supported sites:** Australian Open, Wimbledon, US Open, Roland Garros, ATP Tour, WTA Tour, and more
+        
+        Paste a match URL to automatically extract player info and statistics:
+        """)
+        
         match_url = st.text_input(
             "Match stats URL:",
-            placeholder="https://ausopen.com/match/2026-...",
-            help="Public match URL (e.g., Australian Open)",
+            placeholder="https://ausopen.com/match/2026-elise-mertens-vs-nikola-bartunkova-ws314#!",
+            help="Public match URL (e.g., Australian Open, Wimbledon, ATP/WTA Tours)",
         )
 
-        if auto_refresh and match_url:
-            # Auto-fetch in background
-            with st.spinner("🔄 Auto-fetching latest match stats..."):
-                stats_dict = fetch_match_stats_from_url(match_url)
-            if stats_dict:
-                st.success(f"✅ Updated: {datetime.now().strftime('%H:%M:%S')}")
-                st.session_state.last_refresh = time.time()
-            else:
-                st.warning("⚠️ Could not fetch latest stats. Retrying in 5 seconds...")
-        elif st.button("Fetch & Parse"):
-            with st.spinner("Fetching match stats..."):
-                stats_dict = fetch_match_stats_from_url(match_url)
-            if stats_dict:
-                st.success(
-                    f"✅ Extracted {len(stats_dict)} fields from URL"
-                )
-                st.info("Fill in any missing required fields below")
-                if "url_snapshot" not in st.session_state:
-                    st.session_state.url_snapshot = {}
-                st.session_state.url_snapshot.update(stats_dict)
-            else:
-                st.warning("⚠️ Could not extract stats from URL. Please paste or enter manually.")
+        if match_url:
+            # Create columns for fetch button and refresh toggle
+            col_btn, col_info = st.columns([1, 3])
+            with col_btn:
+                fetch_clicked = st.button("🔍 Fetch & Parse", use_container_width=True)
+            
+            if fetch_clicked or auto_refresh:
+                with st.spinner("🔄 Fetching and parsing match data..."):
+                    stats_dict = fetch_match_stats_from_url(match_url)
+                    
+                    # Also try to get available match pages
+                    available_pages = get_available_match_pages(match_url)
+                
+                if stats_dict:
+                    # Store in session
+                    if "url_snapshot" not in st.session_state:
+                        st.session_state.url_snapshot = {}
+                    st.session_state.url_snapshot.update(stats_dict)
+                    st.session_state.last_refresh = time.time()
+                    
+                    # Show extracted data
+                    st.success(f"✅ Successfully extracted {len(stats_dict)} data fields!")
+                    
+                    # Display extracted player names if available
+                    extracted_cols = st.columns(2)
+                    with extracted_cols[0]:
+                        if "player_a_name" in stats_dict:
+                            st.info(f"👤 Player A: **{stats_dict['player_a_name']}**")
+                    with extracted_cols[1]:
+                        if "player_b_name" in stats_dict:
+                            st.info(f"👤 Player B: **{stats_dict['player_b_name']}**")
+                    
+                    # Show available match pages if detected
+                    if available_pages:
+                        with st.expander("📑 Available Match Pages"):
+                            page_cols = st.columns(len(available_pages) if len(available_pages) <= 4 else 4)
+                            for idx, page in enumerate(available_pages):
+                                with page_cols[idx % 4]:
+                                    st.write(f"• **{page.get('label', page.get('type'))}**")
+                    
+                    # Show extracted stats
+                    with st.expander("📊 Extracted Statistics"):
+                        stat_cols = st.columns(3)
+                        stat_items = list(stats_dict.items())
+                        for idx, (key, value) in enumerate(stat_items):
+                            with stat_cols[idx % 3]:
+                                # Format the display
+                                display_key = key.replace('_', ' ').title()
+                                if isinstance(value, float):
+                                    st.metric(display_key, f"{value:.1%}" if value <= 1 else f"{value:.2f}")
+                                else:
+                                    st.write(f"**{display_key}:** {value}")
+                    
+                    st.info("✏️ Pre-filled values from URL will appear in the fields below. Edit as needed!")
+                else:
+                    st.warning("⚠️ Could not extract stats from this URL. The site may not be supported or data not available yet.")
+                    st.info("💡 Try these example URLs:\n"
+                           "- https://ausopen.com/match/2026-elise-mertens-vs-nikola-bartunkova-ws314#!\n"
+                           "- https://ausopen.com/match/2026-ben-shelton-vs-valentin-vacherot-ms313#!")
+        else:
+            st.info("👆 Paste a tennis match URL above to extract player info and statistics")
 
     elif data_mode == "Paste Snapshot":
         st.subheader("PASTE MATCH STATS")
@@ -120,9 +165,13 @@ def render():
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        player_a_name = st.text_input("Player A:", value="Djokovic", key="pa_name")
+        # Get default from URL extraction if available
+        default_pa = st.session_state.get("url_snapshot", {}).get("player_a_name", "Player A")
+        player_a_name = st.text_input("Player A:", value=default_pa, key="pa_name")
     with col2:
-        player_b_name = st.text_input("Player B:", value="Alcaraz", key="pb_name")
+        # Get default from URL extraction if available
+        default_pb = st.session_state.get("url_snapshot", {}).get("player_b_name", "Player B")
+        player_b_name = st.text_input("Player B:", value=default_pb, key="pb_name")
     with col3:
         best_of_sets = st.selectbox("Best of:", [3, 5], index=1)
 
@@ -174,6 +223,12 @@ def render():
     )
 
     col_a, col_b = st.columns(2)
+    
+    # Get defaults from URL extraction if available
+    url_snapshot = st.session_state.get("url_snapshot", {})
+    default_fsi_a = url_snapshot.get("first_serve_in_pct", 0.65) if isinstance(url_snapshot.get("first_serve_in_pct"), float) else 0.65
+    default_fspw_a = url_snapshot.get("first_serve_points_won_pct", 0.82) if isinstance(url_snapshot.get("first_serve_points_won_pct"), float) else 0.82
+    default_sspw_a = url_snapshot.get("second_serve_points_won_pct", 0.60) if isinstance(url_snapshot.get("second_serve_points_won_pct"), float) else 0.60
 
     with col_a:
         st.subheader(f"📍 {player_a_name}")
@@ -181,7 +236,7 @@ def render():
             "1st Serve In % (A):",
             min_value=0.0,
             max_value=1.0,
-            value=0.65,
+            value=default_fsi_a,
             step=0.01,
             key="fsi_a",
         )
@@ -189,7 +244,7 @@ def render():
             "1st Serve Points Won % (A):",
             min_value=0.0,
             max_value=1.0,
-            value=0.82,
+            value=default_fspw_a,
             step=0.01,
             key="fspw_a",
         )
@@ -197,7 +252,7 @@ def render():
             "2nd Serve Points Won % (A):",
             min_value=0.0,
             max_value=1.0,
-            value=0.60,
+            value=default_sspw_a,
             step=0.01,
             key="sspw_a",
         )
